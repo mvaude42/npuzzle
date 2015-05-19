@@ -37,7 +37,7 @@ if (argv._[0] === "generate")
   require("./cmd/generate")(argv);
 else
 {
-  (async function() {
+  (async function () {
   var makeGoal;
   var stream;
   if (argv.g === "spiral")
@@ -117,38 +117,26 @@ function neighborWithOld(X, Y, toFind, block) {
   return (nextStates);
 }
 
-function prettyNew(X, state) {
-  var i = 0;
-  var line = "";
-  while (i < state.length) {
-    line += state[i] + " ";
-    if (i % X === X - 1)
-    {
-      console.log(line);
-      line = "";
-    }
-    i++;
-  }
-}
-
 function pretty(X, state) {
-  var i = 0;
-  var line = "";
-  var maxNbrSize = 1;
-  console.log(state);
-  while (i < state.length) {
+  function findMaxNbrSize(X, state, i, maxNbrSize) {
+    if (i >= state.length)
+      return (maxNbrSize);
     if (maxNbrSize < Math.floor(Math.log10(state[i])))
       maxNbrSize = Math.floor(Math.log10(state[i]));
-    i++;
+    return (findMaxNbrSize(X, state, i + 1, maxNbrSize));
   }
-  while (i < state.length) {
+  function untilEnd(X, state, i, line, maxNbrSize) {
+    if (i >= state.length)
+      return ;
     line += " ".repeat(maxNbrSize - Math.floor(Math.log10(state[i]))) + state[i];
     if (i % X === X - 1) {
       console.log(line);
       line = "";
     }
-    i++;
+    untilEnd(X, state, i, line, maxNbrSize);
   }
+  console.log(state);
+//  untilEnd(X, state, 0, "", findMaxNbrSize(X, state, 0, 1));
   console.log();
 }
 
@@ -182,13 +170,14 @@ function makeGoalSpiral(start, X, Y) {
 }
 
 function makeGoalNormal(start, X, Y) {
-  var arr = [];
-  var i = 1;
-  while (i <= X * Y)
-  {
-    arr[i - 1] = i;
-    i++;
+  function untilEnd(X, Y, arr, i) {
+    if (i > X * Y)
+      return ;
+    arr[i - 1] == i;
+    untilEnd(X, Y, arr, i + 1);
   }
+  var arr = [];
+  untilEnd(X, Y, arr, 1);
   arr[arr.length-1] = 0;
   return (arr);
 }
